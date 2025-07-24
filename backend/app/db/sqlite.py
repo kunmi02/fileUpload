@@ -62,19 +62,34 @@ def get_all_files(skip: int = 0, limit: int = 100):
         tuple: (files, total_count) where files is a list of file records and
                total_count is the total number of records in the database
     """
+    from ..utils.logger import logger
+    
+    # Ensure parameters are integers
+    try:
+        skip = int(skip)
+        limit = int(limit)
+        logger.info(f"SQLite: Using pagination with skip={skip}, limit={limit}")
+    except (TypeError, ValueError) as e:
+        logger.error(f"SQLite: Error converting pagination parameters: {e}")
+        skip = 0
+        limit = 100
+    
     conn = get_connection()
     cursor = conn.cursor()
     
     # Get total count for pagination metadata
     cursor.execute("SELECT COUNT(*) as count FROM files")
     total_count = cursor.fetchone()["count"]
+    logger.info(f"SQLite: Total records in database: {total_count}")
     
     # Get paginated results
-    cursor.execute(
-        "SELECT * FROM files ORDER BY upload_timestamp DESC LIMIT ? OFFSET ?",
-        (limit, skip)
-    )
+    query = "SELECT * FROM files ORDER BY upload_timestamp DESC LIMIT ? OFFSET ?"
+    logger.info(f"SQLite: Executing query: {query} with params ({limit}, {skip})")
+    
+    cursor.execute(query, (limit, skip))
     rows = cursor.fetchall()
+    logger.info(f"SQLite: Retrieved {len(rows)} records")
+    
     conn.close()
     
     # Convert to list of dictionaries
