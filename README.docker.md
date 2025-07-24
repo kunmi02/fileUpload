@@ -29,7 +29,8 @@ This document explains how to run the CSV Upload Portal using Docker.
 The Docker setup consists of two services:
 
 1. **Backend (FastAPI)**
-   - Python-based API service
+   - Python-based API service with modular architecture
+   - Organized into routes, services, models, and database layers
    - Handles CSV file uploads and processing
    - Converts CSV to Parquet format
    - Stores metadata in SQLite database
@@ -51,7 +52,8 @@ The following data is persisted using Docker volumes:
 To make changes to the code and see them reflected:
 
 1. For backend changes:
-   - Edit files in the `backend` directory
+   - Edit files in the `backend/app` directory structure
+   - Changes to routes, services, models, or database operations should be made in their respective modules
    - The changes will be automatically detected and the server will reload
 
 2. For frontend changes:

@@ -5,19 +5,36 @@ A fullstack web application for uploading, processing, and managing CSV files wi
 ## Project Structure
 
 ```
-├── frontend/               # React frontend application
-│   ├── public/            # Public assets
-│   ├── src/               # Source files
-│   │   ├── App.js         # Main application component
-│   │   ├── Login.js       # Authentication component
-│   │   ├── UploadForm.js  # File upload component
-│   │   ├── FileTable.js   # Display uploaded files
-│   │   └── store.js       # Redux store configuration
-│   └── package.json       # Frontend dependencies
+├── frontend/                # React frontend application
+│   ├── public/             # Public assets
+│   ├── src/                # Source files
+│   │   ├── App.js          # Main application component
+│   │   ├── Login.js        # Authentication component
+│   │   ├── UploadForm.js   # File upload component
+│   │   ├── FileTable.js    # Display uploaded files
+│   │   └── store.js        # Redux store configuration
+│   ├── package.json        # Frontend dependencies
+│   ├── Dockerfile          # Frontend Docker configuration
+│   └── nginx.conf          # Nginx configuration for serving the frontend
 │
-└── backend/               # FastAPI backend application
-    ├── main.py           # API endpoints and business logic
-    └── requirements.txt   # Python dependencies
+└── backend/                # FastAPI backend application
+    ├── app/                # Modularized application package
+    │   ├── main.py         # FastAPI app setup
+    │   ├── routes/         # API route handlers
+    │   │   ├── auth.py     # Authentication endpoints
+    │   │   ├── upload.py   # File upload endpoints
+    │   │   └── files.py    # File listing endpoints
+    │   ├── services/       # Business logic services
+    │   │   ├── auth.py     # Authentication service
+    │   │   └── file_processor.py # CSV to Parquet conversion
+    │   ├── models/         # Data models
+    │   │   └── schemas.py  # Pydantic models
+    │   └── db/             # Database operations
+    │       └── sqlite.py   # SQLite database access
+    ├── main.py             # Entry point for Docker
+    ├── run.py              # Development server entry point
+    ├── Dockerfile          # Backend Docker configuration
+    └── requirements.txt    # Python dependencies
 ```
 
 ## Technologies Used
