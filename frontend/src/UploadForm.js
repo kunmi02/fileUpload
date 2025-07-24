@@ -31,7 +31,7 @@ function UploadForm() {
 
     try {
       // Upload the file
-      const response = await fetch('http://localhost:8000/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -85,7 +85,7 @@ function UploadForm() {
 
   const fetchFiles = async () => {
     try {
-      const response = await fetch('http://localhost:8000/files', {
+      const response = await fetch('/api/files', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

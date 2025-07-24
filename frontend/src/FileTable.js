@@ -16,7 +16,7 @@ function FileTable() {
     dispatch({ type: 'FETCH_FILES_REQUEST' });
     
     try {
-      const response = await fetch('http://localhost:8000/files', {
+      const response = await fetch('/api/files', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

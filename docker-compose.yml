@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    container_name: csv-backend
+    volumes:
+      - ./backend:/app
+      - backend_uploads:/app/uploads
+      - backend_parquet:/app/parquet
+      - backend_db:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: csv-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  backend_uploads:
+    driver: local
+  backend_parquet:
+    driver: local
+  backend_db:
+    driver: local
