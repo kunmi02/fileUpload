@@ -1,10 +1,9 @@
 import os
 import pandas as pd
 from ..db.sqlite import update_file_record
+from ..config import UPLOAD_DIR, PARQUET_DIR
 
-# Directory setup
-UPLOAD_DIR = './uploads'
-PARQUET_DIR = './parquet'
+# Create directories if they don't exist
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(PARQUET_DIR, exist_ok=True)
 

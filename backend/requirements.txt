@@ -4,3 +4,4 @@ pandas
 pyarrow
 sqlalchemy
 python-multipart
+python-dotenv

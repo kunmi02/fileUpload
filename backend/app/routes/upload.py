@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, BackgroundTasks, HTTPE
 from ..services.auth import verify_token
 from ..services.file_processor import process_csv_to_parquet, save_uploaded_file
 from ..db.sqlite import insert_file_record
+from ..config import MAX_UPLOAD_SIZE
 import time
 
 router = APIRouter()
@@ -16,6 +17,20 @@ def upload(
     # Validate file is CSV
     if not file.filename.endswith('.csv'):
         raise HTTPException(status_code=400, detail="Only CSV files are accepted")
+    
+    # Check file size before reading content
+    # FastAPI's UploadFile has a file attribute which is a SpooledTemporaryFile
+    # We can use seek and tell to determine the file size
+    file.file.seek(0, 2)  # Seek to the end of the file
+    file_size = file.file.tell()  # Get current position (file size)
+    file.file.seek(0)  # Reset file position to the beginning
+    
+    # Validate file size
+    if file_size > MAX_UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=413,  # Request Entity Too Large
+            detail=f"File too large. Maximum allowed size is {MAX_UPLOAD_SIZE / (1024 * 1024):.2f} MB"
+        )
     
     # Read the file content
     content = file.file.read()

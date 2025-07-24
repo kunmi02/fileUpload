@@ -1,8 +1,8 @@
 import sqlite3
 import os
+from ..config import DB_PATH
 
-# Database setup
-DB_PATH = './metadata.db'
+# Database setup is now handled by config.py
 
 def init_db():
     """Initialize the SQLite database with necessary tables"""
