@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from ..db.sqlite import update_file_record
 from ..config import UPLOAD_DIR, PARQUET_DIR
+from ..utils.logger import logger
 
 # Create directories if they don't exist
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -22,15 +23,16 @@ def process_csv_to_parquet(file_path: str, filename: str, file_id: int):
             
             # If file has headers but no data rows
             if df.shape[0] == 0 and has_content:
-                print(f"CSV file has headers only: {filename}")
+                logger.warning(f"CSV file has headers only: {filename}")
                 # Count headers as 1 row if you want to treat header-only files as valid
                 row_count = 1  # Set to 1 to count header as a row
             else:
                 # Count actual data rows
                 row_count = df.shape[0]
+                logger.info(f"CSV file processed with {row_count} rows: {filename}")
                 
         except pd.errors.EmptyDataError:
-            print(f"Empty CSV file: {filename}")
+            logger.warning(f"Empty CSV file: {filename}")
             df = pd.DataFrame()
             row_count = 0
         
@@ -53,10 +55,12 @@ def process_csv_to_parquet(file_path: str, filename: str, file_id: int):
         # Update database with metadata
         update_file_record(file_id, row_count, parquet_path, status)
         
+        logger.info(f"File {filename} processed and saved as {parquet_filename} with status: {status}")
+        
     except Exception as e:
         # Update database with error status
         update_file_record(file_id, 0, "", "Error")
-        print(f"Error processing file {filename}: {str(e)}")
+        logger.error(f"Error processing file {filename}: {str(e)}", exc_info=True)
 
 def save_uploaded_file(file_content, filename):
     """Save an uploaded file to the uploads directory"""

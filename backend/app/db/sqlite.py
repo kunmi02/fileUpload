@@ -51,11 +51,29 @@ def update_file_record(file_id, row_count, parquet_path, status):
     conn.commit()
     conn.close()
 
-def get_all_files():
-    """Get all files from the database, ordered by upload timestamp"""
+def get_all_files(skip: int = 0, limit: int = 100):
+    """Get files from the database with pagination, ordered by upload timestamp
+    
+    Args:
+        skip: Number of records to skip (for pagination)
+        limit: Maximum number of records to return
+        
+    Returns:
+        tuple: (files, total_count) where files is a list of file records and
+               total_count is the total number of records in the database
+    """
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM files ORDER BY upload_timestamp DESC")
+    
+    # Get total count for pagination metadata
+    cursor.execute("SELECT COUNT(*) as count FROM files")
+    total_count = cursor.fetchone()["count"]
+    
+    # Get paginated results
+    cursor.execute(
+        "SELECT * FROM files ORDER BY upload_timestamp DESC LIMIT ? OFFSET ?",
+        (limit, skip)
+    )
     rows = cursor.fetchall()
     conn.close()
     
@@ -71,4 +89,4 @@ def get_all_files():
             "status": row["status"]
         })
     
-    return files
+    return files, total_count

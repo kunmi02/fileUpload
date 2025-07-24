@@ -25,6 +25,14 @@ const authReducer = (state = initialAuthState, action) => {
 // Files reducer
 const initialFilesState = {
   files: [],
+  pagination: {
+    total: 0,
+    page: 1,
+    size: 10,
+    pages: 1,
+    next: null,
+    previous: null
+  },
   loading: false,
   error: null
 };
@@ -35,15 +43,44 @@ const filesReducer = (state = initialFilesState, action) => {
       return { ...state, loading: true, error: null };
       
     case 'FETCH_FILES_SUCCESS':
+      console.log('FETCH_FILES_SUCCESS action:', action.payload);
+      
+      // Check if we're receiving a paginated response or a direct array
+      let fileItems = [];
+      let paginationData = {
+        total: 0,
+        page: 1,
+        size: 10,
+        pages: 1,
+        next: null,
+        previous: null
+      };
+      
+      if (Array.isArray(action.payload)) {
+        // Direct array of files (old format)
+        console.log('Received direct array of files');
+        fileItems = action.payload;
+        paginationData.total = action.payload.length;
+      } else {
+        // Paginated response (new format)
+        console.log('Received paginated response');
+        const { items = [], total = 0, page = 1, size = 10, pages = 1, next = null, previous = null } = action.payload;
+        fileItems = items;
+        paginationData = { total, page, size, pages, next, previous };
+      }
+      
       // Merge any temporary processing files with the server response
       const tempFiles = state.files.filter(file => 
         file.id.toString().startsWith('temp-') && 
-        !action.payload.find(serverFile => serverFile.filename === file.filename)
+        !fileItems.find(serverFile => serverFile.filename === file.filename)
       );
+      
+      console.log('Files to render:', [...fileItems, ...tempFiles]);
       
       return { 
         ...state, 
-        files: [...action.payload, ...tempFiles], 
+        files: [...fileItems, ...tempFiles], 
+        pagination: paginationData,
         loading: false, 
         error: null 
       };

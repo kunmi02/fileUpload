@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes import auth, upload, files
 from .db.sqlite import init_db
+from .utils.logger import logger
 
 app = FastAPI()
 
@@ -21,7 +22,9 @@ app.include_router(files.router)
 # Initialize database on startup
 @app.on_event("startup")
 def startup_event():
+    logger.info("Starting application")
     init_db()
+    logger.info("Database initialized")
 
 # Optional: Lambda handler for AWS Lambda deployment
 def handler(event, context):
