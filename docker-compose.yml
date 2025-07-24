@@ -1,7 +1,7 @@
 services:
   backend:
     build: ./backend
-    container_name: csv-backend
+    container_name: backend
     volumes:
       - ./backend:/app
       - backend_uploads:/app/uploads
@@ -19,7 +19,7 @@ services:
 
   frontend:
     build: ./frontend
-    container_name: csv-frontend
+    container_name: frontend
     depends_on:
       - backend
     ports:
