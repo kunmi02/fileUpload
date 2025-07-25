@@ -43,7 +43,6 @@ const filesReducer = (state = initialFilesState, action) => {
       return { ...state, loading: true, error: null };
       
     case 'FETCH_FILES_SUCCESS':
-      console.log('FETCH_FILES_SUCCESS action:', action.payload);
       
       // Force handling as paginated response
       let fileItems = [];
@@ -59,13 +58,11 @@ const filesReducer = (state = initialFilesState, action) => {
       // Check response format and extract data
       if (action.payload && typeof action.payload === 'object' && 'items' in action.payload) {
         // Properly formatted paginated response
-        console.log('Received properly formatted paginated response');
         const { items = [], total = 0, page = 1, size = 10, pages = 1, next = null, previous = null } = action.payload;
         fileItems = items;
         paginationData = { total, page, size, pages, next, previous };
       } else if (Array.isArray(action.payload)) {
         // Direct array of files (old format or incorrect response)
-        console.log('Received direct array of files - this should not happen with properly configured backend');
         fileItems = action.payload;
         paginationData.total = action.payload.length;
         paginationData.pages = Math.ceil(action.payload.length / paginationData.size);
@@ -75,16 +72,11 @@ const filesReducer = (state = initialFilesState, action) => {
         return { ...state, loading: false, error: 'Invalid response format from server' };
       }
       
-      console.log('Extracted file items:', fileItems);
-      console.log('Pagination data:', paginationData);
-      
       // Merge any temporary processing files with the server response
       const tempFiles = state.files.filter(file => 
         file.id.toString().startsWith('temp-') && 
         !fileItems.find(serverFile => serverFile.filename === file.filename)
       );
-      
-      console.log('Files to render:', [...fileItems, ...tempFiles]);
       
       return { 
         ...state, 
